@@ -1,4 +1,4 @@
-shapefile_path = '../data/postal_codes/alberta.shp'
+shapefile_path = '../../data/postal_codes/alberta.shp'
 
 
 class LoadSHP:
