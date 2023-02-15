@@ -5,14 +5,7 @@ from qgis.core import *
 
 # Create a variable for containing the project instance
 # get a reference to the project instance
-# project = QgsProject.instance()
-#
-# # get a list of all the vector layers in the project
-# vector_layers = [layer for layer in project.mapLayers().values() if layer.type() == QgsMapLayer.VectorLayer]
-#
-# # remove each vector layer from the project
-# for layer in vector_layers:
-#     project.removeMapLayer(layer)
+project = QgsProject.instance()
 
 
 class LoadSHP:
@@ -35,6 +28,14 @@ class GeoProcessing:
 
     def clip_processing(self):
         self.processing.run("native:clip", utils.clip_dictionary)
+
+
+def remove_vector_layers():
+    removed_layers = ['alberta', 'calgary_boundary']
+    for layer in project.mapLayers().values():
+        if layer in removed_layers:
+            project.removeMapLayer(layer)
+
 
 
 
