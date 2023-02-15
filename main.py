@@ -1,6 +1,7 @@
 import os
 print(os.getcwd())
-shapefile_path = '/Documents/programming/data_for_good/calgary_emergency_response_times/data/postal_codes/alberta.shp'
+shapefile_path = '../../Documents/programming/data_for_good/calgary_emergency_response_times/data/postal_codes' \
+                 '/alberta.shp'
 
 
 class LoadSHP:
