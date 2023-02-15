@@ -1,3 +1,5 @@
+import os
+print(os.getcwd())
 shapefile_path = '../../data/postal_codes/alberta.shp'
 
 
