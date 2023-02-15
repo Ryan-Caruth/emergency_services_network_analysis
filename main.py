@@ -1,7 +1,7 @@
 import shapefiles
 import utils
 # Import instance of QGIS project
-from qgis.core import *
+from qgis.core import QgsProject
 
 # Create a variable for containing the project instance
 # get a reference to the project instance
@@ -33,10 +33,11 @@ class GeoProcessing:
 def remove_vector_layers():
     removed_layers = ['alberta', 'calgary_boundary']
     for layer in project.mapLayers().values():
-        if layer in removed_layers:
+        if layer.name() in removed_layers:
             project.removeMapLayer(layer)
 
 
+remove_vector_layers()
 
 
 
