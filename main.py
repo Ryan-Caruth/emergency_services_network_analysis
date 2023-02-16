@@ -1,3 +1,5 @@
+from qgis.utils import iface
+
 import shapefiles
 import utils
 # Import instance of QGIS project
@@ -22,7 +24,7 @@ class LoadSHP:
         self.iface.addVectorLayer(shapefiles.addresses_shp, 'calgary_addresses', 'ogr')
 
     def load_clipped_layer(self):
-        self.iface.addVectorLayer(shapefiles.clipped_to_calgary, "Calgary", "ogr")
+        self.iface.addVectorLayer(shapefiles.clipped_to_calgary, "municipality", "ogr")
 
 
 class GeoProcessing:
@@ -41,18 +43,15 @@ def remove_vector_layers():
             project.removeMapLayer(layer)
 
 
-def change_layer_order():
-    rearrange_layer = project.mapLayersByName("Calgary")[0]
-    root_layer = project.layerTreeRoot()
-    rearrange_layer_1 = root_layer.findLayer(rearrange_layer.id())
-    clone = rearrange_layer_1.clone()
-    parent = rearrange_layer_1.parent()
-    parent.insertChildNode(5, clone)
-    parent.removeChildNode(rearrange_layer_1)
+def rearrange():
+    layer = iface.activeLayer()
+    root = QgsProject.instance().layerTreeRoot()
+    root.setHasCustomLayerOrder(True)
+    order = root.customLayerOrder()
+    order.insert(4, order.pop(order.index(layer)))
+    root.setCustomLayerOrder(order)
 
 
 remove_vector_layers()
-change_layer_order()
-
-
+rearrange()
 
