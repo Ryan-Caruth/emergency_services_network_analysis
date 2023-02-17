@@ -1,3 +1,4 @@
+import self as self
 from qgis.utils import iface
 
 import shapefiles
@@ -45,11 +46,17 @@ def remove_vector_layers():
 
 def rearrange():
     layer = iface.activeLayer()
-    root = QgsProject.instance().layerTreeRoot()
-    root.setHasCustomLayerOrder(True)
-    order = root.customLayerOrder()
-    order.insert(4, order.pop(order.index(layer)))
-    root.setCustomLayerOrder(order)
+    if layer is not None:
+        root = project.layerTreeRoot()
+        root.setHasCustomLayerOrder(True)
+        order = root.customLayerOrder()
+        if layer in order:
+            order.insert(5, order.pop(order.index(layer)))
+            root.setCustomLayerOrder(order)
+        else:
+            print("Layer not found in layer order")
+    else:
+        print("No active layer selected")
 
 
 remove_vector_layers()
