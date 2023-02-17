@@ -27,6 +27,9 @@ class LoadSHP:
     def load_clipped_layer(self):
         self.iface.addVectorLayer(shapefiles.clipped_to_calgary, "municipality", "ogr")
 
+    def load_joined_layer(self):
+        self.iface.addVectorLayer(shapefiles.addresses_within_fsa, "Addresses within FSA", "ogr")
+
 
 class GeoProcessing:
 
@@ -36,6 +39,9 @@ class GeoProcessing:
     def clip_processing(self):
         self.processing.run("native:clip", utils.clip_dictionary)
 
+    def join_by_location(self):
+        self.processing.run("native:joinattributesbylocation", utils.join_dictionary)
+
 
 def remove_vector_layers():
     removed_layers = ['alberta', 'calgary_boundary']
@@ -44,21 +50,28 @@ def remove_vector_layers():
             project.removeMapLayer(layer)
 
 
-def rearrange():
-    layer = iface.activeLayer()
-    if layer is not None:
-        root = project.layerTreeRoot()
-        root.setHasCustomLayerOrder(True)
-        order = root.customLayerOrder()
-        if layer in order:
-            order.insert(5, order.pop(order.index(layer)))
-            root.setCustomLayerOrder(order)
-        else:
-            print("Layer not found in layer order")
-    else:
-        print("No active layer selected")
+def remove_addresses_layer():
+    removed_layers = ['calgary_addresses']
+    for layer in project.mapLayers().values():
+        if layer.name() in removed_layers:
+            project.removeMapLayer(layer)
+
+# def rearrange():
+    # layer = iface.activeLayer()
+    # if layer is not None:
+        # root = project.layerTreeRoot()
+        # root.setHasCustomLayerOrder(True)
+        # order = root.customLayerOrder()
+        # if layer in order:
+            # order.insert(5, order.pop(order.index(layer)))
+            # root.setCustomLayerOrder(order)
+        # else:
+            # print("Layer not found in layer order")
+    # else:
+        # print("No active layer selected")
 
 
 remove_vector_layers()
-rearrange()
+remove_addresses_layer()
+# rearrange()
 
