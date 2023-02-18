@@ -4,11 +4,24 @@ from qgis.utils import iface
 import shapefiles
 import utils
 # Import instance of QGIS project
-from qgis.core import QgsProject
+from qgis.core import QgsProject, QgsVectorLayer
+# import the analysis module from qgis
+from qgis.analysis import *
 
 # Create a variable for containing the project instance
 # get a reference to the project instance
 project = QgsProject.instance()
+
+# Grab layer that will be the base for our network analysis
+base_layer = QgsVectorLayer(shapefiles.roads_shp, 'network', 'ogr')
+
+# Create a network model by defining network topology and assigning cost values to network edges
+
+# convert network data into a graph data structure
+
+# Run the shortest path algorithm on graph to find the fastest path
+
+
 
 
 class LoadSHP:
