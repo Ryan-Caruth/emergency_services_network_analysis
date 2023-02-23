@@ -35,8 +35,11 @@ class LoadSHP:
     def load_joined_layer(self):
         self.iface.addVectorLayer(shapefiles.addresses_within_fsa, "Addresses within FSA", "ogr")
 
-    def load_network_analysis(self):
-        self.iface.addVectorLayer(shapefiles.network_test, "address to station", "ogr")
+    def load_new_addresses(self):
+        self.iface.addVectorLayer(shapefiles.addresses_without_null, "address_for_network", "ogr")
+
+    # def load_network_analysis(self):
+        # self.iface.addVectorLayer(shapefiles.network_test, "address to station", "ogr")
 
 
 class GeoProcessing:
@@ -51,30 +54,48 @@ class GeoProcessing:
         self.processing.run("native:joinattributesbylocation", utils.join_dictionary)
 
     def get_coordinates(self):
-        address = project.mapLayersByName("test_address")[0]
+        address = project.mapLayersByName("testing_addresses")[0]
         # Retrieve the data provider of the selected feature
         # Get all the attributes of the feature
         features = address.getFeatures()
-        fire_station = project.mapLayersByName("test_fire_station")[0]
+        fire_station = project.mapLayersByName("testing_fire_stations")[0]
         fire_location = fire_station.getFeatures()
-        for feature1 in features:
+        output_layers = []
+        for fire_station_feature in fire_location:
+            print('fire_stations')
             # fetch geometry
             #    show some information about the feature geometry
-            geom = feature1.geometry().asPoint()
-            address_x, address_y = geom.x(), geom.y()
-            for feature2 in fire_location:
+            fire_station_geometry = fire_station_feature.geometry().asPoint()
+            fire_station_x, fire_station_y = fire_station_geometry.x(), fire_station_geometry.y()
+            for address_feature in features:
+                print('addresses')
                 # fetch geometry
-                station_locations = feature2.geometry().asPoint()
-                stations_x, stations_y = station_locations.x(), station_locations.y()
+                address_geometry = address_feature.geometry().asPoint()
+                address_x, address_y = address_geometry.x(), address_geometry.y()
                 #    show some information about the feature geometry
-                self.processing.run("native:shortestpathpointtopoint", {
-                    'INPUT': '../../Documents/programming/data_for_good/calgary_emergency_response_times/data/calgary'
-                             '-roads/roads.shp',
-                    'STRATEGY': 0,
-                    'START_POINT': f"{address_x},{address_y}",
-                    'END_POINT': f'{stations_x},{stations_y}',
-                    'OUTPUT': shapefiles.network_test
-                })
+                params = {
+                            'INPUT': '../../Documents/programming/data_for_good/calgary_emergency_response_times/data/calgary'
+                                     '-roads/roads.shp',
+                            'STRATEGY': 0,
+                            'START_POINT': f"{address_x},{address_y}",
+                            'END_POINT': f'{fire_station_x},{fire_station_y}',
+                            'OUTPUT': 'memory: network_analysis'
+                        }
+                result = self.processing.run("native:shortestpathpointtopoint", params)
+                output_layers.append(result['OUTPUT'])
+
+                print('Output_layer is:', output_layers)
+
+                merged_layer = self.processing.run("qgis:mergevectorlayers", {
+                            'LAYERS': output_layers,
+                            'CRS': output_layers[0].crs().authid(),
+                            # set the CRS of the output layer to the same as the input layers
+                            'OUTPUT': "memory: network_analysis"
+                })['OUTPUT']
+
+                print('merge is:', merged_layer.featureCount())
+
+        QgsProject.instance().addMapLayer(merged_layer, True)
 
 
 def remove_vector_layers():
